@@ -22,7 +22,6 @@ public class RandomAgent implements Agent{
    * */
   public String toString(){return "Rando";}
 
-
   /**
    * Method called at the start of a round
    * @param start the starting state of the round
