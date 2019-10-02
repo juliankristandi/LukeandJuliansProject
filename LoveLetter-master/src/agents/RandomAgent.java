@@ -14,7 +14,7 @@ public class RandomAgent implements Agent{
 
   //0 place default constructor
   public RandomAgent(){
-    rand  = new Random();
+    rand = new Random();
   }
 
   /**

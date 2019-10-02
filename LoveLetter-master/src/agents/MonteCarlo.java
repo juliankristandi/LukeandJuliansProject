@@ -1,5 +1,6 @@
-package loveletter;
+package agents;
 import loveletter.*;
+import java.util.Random;
 
 /**
  * An interface for representing an agent in the game Love Letter
@@ -7,23 +8,43 @@ import loveletter.*;
  * */
 public class MonteCarlo implements Agent{
 
+  private Random rand;
   private State current; 
   private int myIndex; 
 
+  public MonteCarlo(){
+
+  }
+    
+  /**
+   * Class to initialize Binary Tree
+   * */
   class Node{
     Node left;
     Node right;
-    int score;
+    int wins;
+    int selected;
+    int available;
 
-    Node(int score){
+    Node(int wins, int selected, int available){
       left = null;
       right = null;
-      this.score = score; 
+      this.wins = wins; 
+      this.selected = selected;
+      this.available = available;
     }
   }
 
-  public class BinaryTree{
+  class BinaryTree{
     Node root;
+
+    BinaryTree(int wins, int selected, int available){
+      root = new Node(wins, selected, available);
+    }
+
+    BinaryTree(){
+      root = null;
+    }
   }
 
   /**
@@ -41,7 +62,7 @@ public class MonteCarlo implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
-    BinaryTree tree = new BinaryTree();
+    BinaryTree bt = new BinaryTree(0, 0, 0); 
   }
 
   /**
@@ -62,8 +83,12 @@ public class MonteCarlo implements Agent{
   public Action playCard(Card c){
     Action act = null; 
     Card play;
-    //tree.add();
+    return act;
   }
+
+  public void addTree(Node currentNode, int winsNumber, int selectedNumber, int availableNumber) {
+
+  } 
 }
 
 

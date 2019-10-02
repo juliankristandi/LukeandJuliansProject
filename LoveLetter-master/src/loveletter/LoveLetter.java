@@ -2,6 +2,7 @@ package loveletter;
 import java.util.Random;
 import java.io.PrintStream;
 import agents.RandomAgent;
+import agents.MonteCarlo; //test
 
 /**
  * A class for running a single game of LoveLetter.
@@ -14,6 +15,8 @@ public class LoveLetter{
   private Random random;
   private PrintStream ps;
 
+  private Agent monte; //test
+
   /**
    * Constructs a LoveLetter game.
    * @param seed a seed for the random number generator.
@@ -23,6 +26,7 @@ public class LoveLetter{
     this.random = new Random(seed);
     this.ps = ps;
     rando = new RandomAgent();
+    monte = new MonteCarlo(); //test
   }
 
   /**
@@ -87,7 +91,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
    * The agent implementations should be in the default package.
    * */
   public static void main(String[] args){
-    Agent[] agents = {new agents.RandomAgent(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+    Agent[] agents = {new agents.RandomAgent(),new agents.MonteCarlo(), new agents.MonteCarlo(), new agents.RandomAgent()}; //test
     LoveLetter env = new LoveLetter();
     StringBuffer log = new StringBuffer("A simple game for four random agents:\n");
     int[] results = env.playGame(agents);
