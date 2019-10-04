@@ -1,6 +1,8 @@
 package agents;
 import loveletter.*;
 import java.util.Random;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * An interface for representing an agent in the game Love Letter
@@ -11,10 +13,12 @@ public class Agent1 implements Agent{
   private Random rand;
   private State current;
   private int myIndex;
+  private HashMap<State, Node> stateNode;
 
   //0 place default constructor
   public Agent1(){
     rand  = new Random();
+    stateNode = new HashMap<State, Node>();
   }
 
   /**
@@ -22,6 +26,23 @@ public class Agent1 implements Agent{
    * */
   public String toString(){return "The First Agent";}
 
+  class Node{
+    State state;
+    int win; // 0 for lose, 1 for win, -1 for unchecked
+    ArrayList<Node> children;
+    Node parent;
+
+    Node(State state, int win, ArrayList<Node> children, Node parent){
+      this.state = state;
+      this.win = win;
+      this.children = children;
+      this.parent = parent;
+    }
+  }
+
+  public void addTree(State state, Node node){
+    stateNode.put(state, node);
+  }
 
   /**
    * Method called at the start of a round
@@ -30,6 +51,7 @@ public class Agent1 implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
+    stateNode.clear();
   }
 
   /**
