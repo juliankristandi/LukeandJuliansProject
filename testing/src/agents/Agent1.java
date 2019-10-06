@@ -79,7 +79,7 @@ public class Agent1 implements Agent{
    * **/
   public void see(Action act, State results){
     current = results;
-  }
+  }  
 
   public ArrayList<Action> possibleActionsList (Card card){
     ArrayList<Action> possibleActions = new ArrayList<Action>();
@@ -237,24 +237,68 @@ public class Agent1 implements Agent{
       //System.out.println("theres a GUARD in our hand");
     }
     else{ 
-      
-      ArrayList<Action> possibleActions = new ArrayList<Action>();
+      //  while(!current.legalAction(act, c)){
+      //     if(rand.nextDouble()<0.5) play= c;
+      //     else play = current.getCard(myIndex);
+      //     int target = rand.nextInt(current.numPlayers());
+      //     try{
+      //       switch(play){
+      //         case PRIEST:
+      //           act = Action.playPriest(myIndex, target);
+      //           break;
+      //         case BARON:  
+      //           act = Action.playBaron(myIndex, target);
+      //           break;
+      //         case PRINCE:  
+      //           act = Action.playPrince(myIndex, target);
+      //           break;
+      //         case KING:
+      //           act = Action.playKing(myIndex, target);
+      //           break;
+      //         case COUNTESS:
+      //           act = Action.playCountess(myIndex);
+      //           break;
+      //         default:
+      //           act = null;//never play princess
+      //       }
+      //     }catch(IllegalActionException e){/*do nothing, just try again*/}  
+      //   }
+      // return act;
+
+      Node parent = stateNode.get(current);
+   	  ArrayList<Action> possibleActions = new ArrayList<Action>();
       possibleActions = possibleActionsList(c);
-      State clone = current;
 
       for(int i = 0; i < possibleActions.size(); i++){
+      	State clone = current;
         try{
           clone.update(possibleActions.get(i), clone.drawCard());
         }
         catch(IllegalActionException e){}
 
+        Node child = new Node(clone, -1, Collections.<Node>emptyList(), parent);
+        // CREATE NODE FUNCTION? LINK TO PARENTS, UPDATE PARENTS CHILDREN LIST
+
       }
 
-      return null;
+      }
+    return act;
     }
-    return null;
-  } 
 
-}
+    // C
+    // O
+    // P
+    // Y
+    //
+    // P 
+    // A
+    // S
+    // T 
+    // E
+
+    
+
+} 
+
 
 
