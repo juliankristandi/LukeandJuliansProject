@@ -3,6 +3,7 @@ import java.util.Random;
 import java.io.PrintStream;
 import agents.RandomAgent;
 import agents.Agent1;
+import agents.heuristicAgent;
 
 /**
  * A class for running a single game of LoveLetter.
@@ -13,10 +14,15 @@ public class LoveLetter{
 
   private Agent rando;
   private Agent agent1;
+  private Agent heuristicAgent;
   private Random random;
   private PrintStream ps;
   static int[] winners = new int[4];
 
+  // ************************ SET THESE TO ENABLE TEST MODE
+  static boolean TESTMODE = true;
+  static int gameNumber = 10000;
+  // ************************ SET THESE TO ENABLE TEST MODE
   /**
    * Constructs a LoveLetter game.
    * @param seed a seed for the random number generator.
@@ -27,6 +33,7 @@ public class LoveLetter{
     this.ps = ps;
     rando = new RandomAgent();
     agent1 = new Agent1();
+    heuristicAgent = new heuristicAgent();
   }
 
   /**
@@ -57,12 +64,16 @@ public class LoveLetter{
           agents[i].newRound(playerStates[i]);
         }
         while(!gameState.roundOver()){
-System.out.println("Cards are:\nplayer 0:"+gameState.getCard(0)+"\nplayer 1:"+gameState.getCard(1)+"\nplayer 2:"+gameState.getCard(2)+"\nplayer 3:"+gameState.getCard(3));        
+          if(!TESTMODE){System.out.println("Cards are:\nplayer 0:"+gameState.getCard(0)+"\nplayer 1:"+gameState.getCard(1)+"\nplayer 2:"+gameState.getCard(2)+"\nplayer 3:"+gameState.getCard(3));}      
           Card topCard = gameState.drawCard(); 
-System.out.println("Player "+gameState.nextPlayer()+" draws the "+topCard);
+          if(!TESTMODE){System.out.println("Player "+gameState.nextPlayer()+" draws the "+topCard);}
           Action act = agents[gameState.nextPlayer()].playCard(topCard);
+
           try{
-            ps.println(gameState.update(act,topCard));
+            if(!TESTMODE){ps.println(gameState.update(act,topCard));
+
+            }else if(TESTMODE == true){gameState.update(act,topCard);}
+            
           }
           catch(IllegalActionException e){
             ps.println("ILLEGAL ACTION PERFORMED BY PLAYER "+agents[gameState.nextPlayer()]+
@@ -72,11 +83,11 @@ System.out.println("Player "+gameState.nextPlayer()+" draws the "+topCard);
           for(int p = 0; p<numPlayers; p++)
             agents[p].see(act,playerStates[p]);
         }
-System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\nplayer 1:"+gameState.score(1)+"\nplayer 2:"+gameState.score(2)+"\nplayer 3:"+gameState.score(3));        
+        if(!TESTMODE){System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\nplayer 1:"+gameState.score(1)+"\nplayer 2:"+gameState.score(2)+"\nplayer 3:"+gameState.score(3));}        
         gameState.newRound();
       }
       winners[gameState.gameWinner()]++;
-      ps.println("Player "+gameState.gameWinner()+" wins the Princess's heart!");
+      if(!TESTMODE){ps.println("Player "+gameState.gameWinner()+" wins the Princess's heart!");}
       int[] scoreboard = new int[numPlayers];
       for(int p = 0; p<numPlayers; p++)scoreboard[p] = gameState.score(p);
       return scoreboard;
@@ -93,14 +104,19 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
    * Enable testmode and games to run a larger test
    * */
   public static void main(String[] args){
-    boolean TESTMODE = true;
-    int gameNumber = 1000;
 
     if(TESTMODE == true){
       
       
       for(int i = 0;i<gameNumber;i++){
-        Agent[] agents = {new agents.Agent1(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+        if(i == gameNumber/5){
+          System.out.println("~~~~~~~20% Complete\n");
+        }else if(i == gameNumber/2.5){
+          System.out.println("~~~~~~~50% Complete\n");
+        }else if(i == gameNumber/1.25){
+          System.out.println("~~~~~~~75% Complete\n");
+        }        
+        Agent[] agents = {new agents.heuristicAgent(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
         LoveLetter env = new LoveLetter();
         int[] results = env.playGame(agents);
         
@@ -111,13 +127,15 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
         System.out.println("Agent " + i + ": " + winners[i] + " out of " + total);
       }
     }else{
-      Agent[] agents = {new agents.Agent1(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+      Agent[] agents = {new agents.heuristicAgent(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
       LoveLetter env = new LoveLetter();
       StringBuffer log = new StringBuffer("A simple game for four random agents:\n");
       int[] results = env.playGame(agents);
+      if(!TESTMODE){
       env.ps.print("The final scores are:\n");
       for(int i= 0; i<agents.length; i++)
         env.ps.print("\t Agent "+i+", \""+agents[i]+"\":\t "+results[i]+"\n");
+    }
   }
   }
 }

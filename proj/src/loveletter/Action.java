@@ -5,7 +5,11 @@ package loveletter;
  * The class is designed to be immutable.
  * @author Tim French
  **/
+
+
 public class Action{
+
+  static boolean TESTMODE = true;
   //the player performing the action
   private Card card;
   //the player's name (for nice formatting)
@@ -58,7 +62,7 @@ public class Action{
    * @return a string representation of the action
    * **/
   public String toString(String player, String target){
-    String str = "Player "+player+" played the "+card; 
+    String str = "Player "+player+" played the "+card;
     switch(card){
       case GUARD: return str+" and guessed player "+target+" held the "+guess+".";
       case PRIEST: return str+" and asked to see player "+target+"'s card.";
