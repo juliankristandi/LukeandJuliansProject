@@ -69,7 +69,7 @@ public class Agent1 implements Agent{
       int bestTarget = -1;
       int bestScore = -1;
       int bestGuardTarget = -1;
-      int[] cardStorage = new int[] {5,2,2,2,2,1,1,1};
+      int[] cardStorage = new int[] {5,2,2,2,2,1,1,1}; // 0 1 2 3 4 5 6 7
 
       for(int i = 0; i < current.numPlayers();i++){
         java.util.Iterator<Card> discardPile = current.getDiscards(i);
@@ -106,31 +106,33 @@ public class Agent1 implements Agent{
           System.out.println(val);
         }
       }
+
+
         for(int z = 0; z < 8;z++){
           System.out.println("There are " + cardStorage[z] + " " + Card.values()[z] + "'s");
         }
-          for(int j = 7; j > 0; j--){ // prob;e, here
-            if(cardStorage[j] ==1){
-              bestGuardTarget = j + 1;
-            }
+
+        for(int j = 1; j <8; j++){ // problem here
+          if(cardStorage[j] == 1){
+            bestGuardTarget = j ;
           }
-          for(int j = 7; j >0;j--){
-            if(cardStorage[j] == 2){
-              bestGuardTarget = j + 1;
-            }
+        }
+        for(int j = 1; j <8; j++){ // problem here
+          if(cardStorage[j] == 2){
+            bestGuardTarget = j;
           }
+        }// bestGuardTarget is -1 from here in edge case
 
-        System.out.println(" im picking" + Card.values()[bestGuardTarget]);
+        System.out.println("Im picking the " + Card.values()[bestGuardTarget]);
 
-
-      
         for(int i = 0; i < current.numPlayers(); i++){
-          if( i != myIndex && current.score(i) >= bestScore && !current.eliminated(i)){
+          if( i != myIndex && current.score(i) >= bestScore && !current.eliminated(i) && !current.handmaid(i)){
             System.out.println("Player " + i + " has score: " + current.score(i));
             bestTarget = i;
             bestScore = current.score(i);
           }
         }
+
         System.out.println("So im picking " + bestTarget);
         try{
 
@@ -139,11 +141,17 @@ public class Agent1 implements Agent{
           System.out.println(current.eliminated(1));
           System.out.println(current.eliminated(2));
           System.out.println(current.eliminated(3));
-          
-          act = Action.playGuard(myIndex, bestTarget, Card.values()[bestGuardTarget]);
+          if(bestTarget != -1){
+           act = Action.playGuard(myIndex, bestTarget, Card.values()[bestGuardTarget]);
+          }else{
+            act = playRandomCard(c);
+          }
+          System.out.println("The stateof my move is" + current.legalAction(act, c));
+
           System.out.println("MyIndex is " + myIndex);
           System.out.println("The best target is " + bestTarget);
           System.out.println("The card im going to guess is " + Card.values()[bestGuardTarget]);
+
         }catch(IllegalActionException e){} 
     System.out.println("Weve made it out of the catch statement");
       
@@ -178,6 +186,46 @@ public class Agent1 implements Agent{
       }
     return act;
   }
-}
 
+
+
+  public Action playRandomCard(Card c){
+    Action act = null;
+    Card play;
+    while(!current.legalAction(act, c)){
+      if(rand.nextDouble()<0.5) play= c;
+      else play = current.getCard(myIndex);
+      int target = rand.nextInt(current.numPlayers());
+      try{
+        switch(play){
+          case GUARD:
+          Card pick = Card.values()[rand.nextInt(7)+1];
+            act = Action.playGuard(myIndex, target, pick);
+            break;
+          case PRIEST:
+            act = Action.playPriest(myIndex, target);
+            break;
+          case BARON:  
+            act = Action.playBaron(myIndex, target);
+            break;
+          case HANDMAID:
+            act = Action.playHandmaid(myIndex);
+            break;
+          case PRINCE:  
+            act = Action.playPrince(myIndex, target);
+            break;
+          case KING:
+            act = Action.playKing(myIndex, target);
+            break;
+          case COUNTESS:
+            act = Action.playCountess(myIndex);
+            break;
+          default:
+            act = null;//never play princess
+        }
+      }catch(IllegalActionException e){/*do nothing, just try again*/}  
+    }
+    return act;
+  }
+}
 
