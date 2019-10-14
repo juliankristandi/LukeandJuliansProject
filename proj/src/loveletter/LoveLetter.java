@@ -2,7 +2,7 @@ package loveletter;
 import java.util.Random;
 import java.io.PrintStream;
 import agents.RandomAgent;
-import agents.Agent1;
+import agents.MonteCarlo;
 
 /**
  * A class for running a single game of LoveLetter.
@@ -12,7 +12,7 @@ import agents.Agent1;
 public class LoveLetter{
 
   private Agent rando;
-  private Agent agent1;
+  private Agent monte;
   private Random random;
   private PrintStream ps;
   static int[] winners = new int[4];
@@ -26,7 +26,7 @@ public class LoveLetter{
     this.random = new Random(seed);
     this.ps = ps;
     rando = new RandomAgent();
-    agent1 = new Agent1();
+    monte = new MonteCarlo();
   }
 
   /**
@@ -100,7 +100,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
       
       
       for(int i = 0;i<gameNumber;i++){
-        Agent[] agents = {new agents.Agent1(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+        Agent[] agents = {new agents.MonteCarlo(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
         LoveLetter env = new LoveLetter();
         int[] results = env.playGame(agents);
         
@@ -111,7 +111,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
         System.out.println("Agent " + i + ": " + winners[i] + " out of " + total);
       }
     }else{
-      Agent[] agents = {new agents.Agent1(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+      Agent[] agents = {new agents.MonteCarlo(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
       LoveLetter env = new LoveLetter();
       StringBuffer log = new StringBuffer("A simple game for four random agents:\n");
       int[] results = env.playGame(agents);
