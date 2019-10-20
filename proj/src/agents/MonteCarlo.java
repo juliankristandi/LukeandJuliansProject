@@ -45,6 +45,16 @@ public class MonteCarlo implements Agent{
 
   }
 
+  class actionNode{
+  	ArrayList<Action> actionList;
+  	Node[] nodeList;
+
+  	actionNode(ArrayList<Action> actionList, Node[] nodeList){
+  		this.actionList = actionList;
+  		this.nodeList = nodeList;
+  	}
+  }
+
   public Node newNode(int id, Action action, int[] ratio, ArrayList<Node> children, Node parent){
     Node x = new Node(nodeCounter, action, ratio, children, parent);
     nodeCounter++;
@@ -75,7 +85,7 @@ public class MonteCarlo implements Agent{
     }
     nodeCounter = 0;
     ArrayList<Node> rootList = new ArrayList<Node>();
-    root = new Node(nodeCounter, null, new int[]{-1, 1, 1}, rootList, null);
+    root = newNode(nodeCounter, null, new int[]{-1, 1, 1}, rootList, null);
   }
 
   /**
@@ -257,47 +267,42 @@ public class MonteCarlo implements Agent{
     Random r = new Random();
     float chance = r.nextFloat();
 
+    if(cardDrawn == cardSelected) {
+      ratio[2]++;
+    }
     if(cardDrawn == 0){
       ratio[1]++;
-      ratio[2]++;
       if(chance <= 0.15f){ // 15% success rate 
         playerKilled = r.nextInt(3); // random player
       }
     }
     else if(cardDrawn == 1){
       ratio[1]++;
-      ratio[2]++;
     }
     else if(cardDrawn == 2){
       ratio[1]++;
-      ratio[2]++;
-      if(chance <= 0.30f){ // 30% success rate 
+      if(chance <= 0.30f){ // 25% success rate 
         playerKilled = r.nextInt(3); // random player
       }  
     }
     else if(cardDrawn == 3){
       ratio[1]++;
-      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 4){
       ratio[1]++;
-      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 5){
       ratio[1]++;
-      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 6){
       ratio[1]++;
-      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 7){
       ratio[1]++;
-      ratio[2]++;
       //nothing
     }
     ratio[0] = playerKilled;
@@ -341,13 +346,11 @@ public class MonteCarlo implements Agent{
   public Action playCard(Card c){
     Action act = null;
     Card play;
-    Node parent = root;
     ArrayList<Action> possibleActions = new ArrayList<Action>();
     possibleActions = possibleActionsList(c, current);
       
     int[] cardStorage = new int[] {5,2,2,2,2,1,1,1};
 
-    int cardRemaining = 0;
     int playerRemaining = current.numPlayers();
 
     for(int i = 0; i < current.numPlayers();i++){
@@ -355,7 +358,6 @@ public class MonteCarlo implements Agent{
     	java.util.Iterator<Card> discardPile = current.getDiscards(i);
         
         while(discardPile.hasNext()){
-          cardRemaining--;
           int val = discardPile.next().value();
           switch(val){
             case 1:
@@ -384,76 +386,126 @@ public class MonteCarlo implements Agent{
               break;
           }
         }
-      }
+    }
 
     Node[] nodeList = new Node[possibleActions.size()];
 
-    for(int i = 0; i < possibleActions.size(); i++){
-        int[] cardClone = cardStorage;
-        int currentCard = c.value();
-        int turn = current.nextPlayer();
-        int win = 0;
-        int played = 0;
-        int available = 0;
-        ArrayList<Node> arrayList = new ArrayList<Node>();
-        int[] simulation = new int[]{-1, 1, 1};
-        while(true){
-        	turn = turn % 4;
-
-          	ArrayList<Integer> remaining = new ArrayList<Integer>();
-          	int exist = 0;
-          	for (int x = 0; x < cardClone.length; x++){
-            	if(cardClone[x] != 0){
-            		remaining.add(x);
-              		exist++;
-              		cardRemaining = cardRemaining + cardClone[x];
-            	}
-          	}
-
-          	if(exist == 0 || playerRemaining == 1) {
-            	win = 1;
-            	simulation[0] = win;
-            	break;
-          	}
-
-          	int draw = Math.abs(rand.nextInt() % exist);
-          	int result = remaining.get(draw);
-          	cardClone[result]--;
-          	cardRemaining--;
-
-          	//SIMULATION FUNCTION
-          	simulation = simulateGameplay(result, currentCard, simulation);
-          		if(simulation[0] != -1){
-            		playerRemaining--;
-          		}
-          		if (simulation[0] == myIndex){
-            		win = 0;
-            		simulation[0] = win;
-            		break;
-          		}
-          	turn++;
-        }
-
-        Node child = new Node(nodeCounter, possibleActions.get(i), simulation, arrayList, parent);
-        nodeList[i] = child;
+    for(int a = 0; a < nodeList.length; a++){
+    	nodeList[a] = newNode(nodeCounter, possibleActions.get(a), new int[]{-1, 1, 1}, new ArrayList<Node>(), root);
     }
+
+	actionNode struct = new actionNode(possibleActions, nodeList);
+	struct = monteLoop(struct, cardStorage, c.value(), 0, 0); 
 
     Action best = null;
     double compare = 0.0;
     //for loop sort array
     for(int x = 0; x < possibleActions.size(); x++){
-    	//NODE LIST
-    	if((nodeList[x].ratio[0] / nodeList[x].ratio[2]) > compare){
-    		compare = nodeList[x].ratio[0] / nodeList[x].ratio[2];
-    		best = nodeList[x].action;
+    	if((struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2]) > compare){
+    		compare = struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2];
+    		best = struct.nodeList[x].action;
       	}  
     }
+
     if (best == null){
     	return possibleActions.get(0);
     }
     return best;
-
   }
     
+  public actionNode monteLoop(actionNode action, int[] cardStorage, int currentCard, int depth, int max){ 
+  	if(max == 1 && depth > 0){ // NOPE
+  		return action;
+  	}
+  	int maxwin = 0;
+  	if(action.actionList.size() == 1){
+  		return action;
+  	}
+  	
+  	 	for(int i = 0; i < action.actionList.size(); i++){
+  	  		int playerRemaining = current.numPlayers();
+  	  		int cardRemaining = 0;
+  	  		int[] simulation;
+  	  		if (depth == 0){
+  	  			simulation = new int[]{-1, 1, 1};
+  	  		}
+  	  		else{
+  	  			simulation = action.nodeList[i].ratio;
+  	  		}
+  	  		int turn = current.nextPlayer();
+  	  		int[] cardClone = cardStorage;
+  	  		ArrayList<Node> arrayList = new ArrayList<Node>();
+  	  		while(true){
+  	  			turn = turn % 4; 
+
+  	  			ArrayList<Integer> remaining = new ArrayList<Integer>();
+  	  			int exist = 0;
+  	  			for (int x = 0; x < cardClone.length; x++){
+  	  		  		if(cardClone[x] != 0){
+  		  		  		remaining.add(x);
+  	  		    			exist++;
+  	  		    			cardRemaining = cardRemaining + cardClone[x];
+  	  		  		}
+  	  			}
+  	  			
+  	  			if(exist == 0 || playerRemaining == 1) {
+  	  				if(depth == 0){
+  	  					simulation[0] = 1;
+  	  					maxwin = 1;
+  	  				}
+  	  				else{
+  	  					simulation[0] = simulation[0]++;
+  	  					if(simulation[0] > maxwin){
+  	  						maxwin = simulation[0];
+  	  					}
+  	  				}
+  	  		  		break;
+  	  			}
+  	  				
+  	  			int draw = Math.abs(rand.nextInt() % exist);
+  	  			int result = remaining.get(draw);
+  	  			cardClone[result]--;
+  	  			cardRemaining--;
+
+  	  			//SIMULATION FUNCTION
+  	  			simulation = simulateGameplay(result, currentCard, simulation);
+  	  			if(simulation[0] != -1){
+  	  		  		playerRemaining--;
+  	  			}
+  	  			if (simulation[0] == myIndex){
+   		  			if(depth == 0){
+   		  				simulation[0] = 0;
+   		  			}
+   		  			break;
+  	  				}
+  	  			turn++;
+  	  		}
+
+  	  		if(depth == 0){
+  	  			action.nodeList[i].ratio = simulation;
+  	  		}
+  	  		else{
+  	  			action.nodeList[i] = newNode(nodeCounter, action.actionList.get(i), simulation, arrayList, action.nodeList[i]);
+  	  		}
+  	  	}
+  	  	
+  	  	if (maxwin == 0){
+  	  		return action;
+  	  	}
+
+  	  	ArrayList<Action> improved = new ArrayList<Action>();
+  	  	ArrayList<Node> solulist = new ArrayList<Node>();
+  	  	for(int x = 0; x < action.actionList.size(); x++){
+  	  		if (action.nodeList[x].ratio[0] == maxwin){
+  	  			improved.add(action.actionList.get(x));
+  	  			solulist.add(action.nodeList[x]);
+  	  		}
+  	  	}
+  	  	Node[] solList = solulist.toArray(new Node[solulist.size()]);
+  	  	actionNode solution = new actionNode(improved, solList);
+  	  	solution = monteLoop(solution, cardStorage, currentCard, 1, maxwin);
+  	
+  	return action;
+  }
 
 }

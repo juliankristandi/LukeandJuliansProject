@@ -93,7 +93,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
    * Enable testmode and games to run a larger test
    * */
   public static void main(String[] args){
-    boolean TESTMODE = false;
+    boolean TESTMODE = true;
     int gameNumber = 1000;
 
     if(TESTMODE == true){
