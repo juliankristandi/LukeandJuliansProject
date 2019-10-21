@@ -31,7 +31,7 @@ public class MonteCarlo implements Agent{
   class Node{
     int id;
     Action action;
-    int[] ratio; // [win, played, available] 
+    int[] ratio; // [win, played, available, playerKilled] 
     ArrayList<Node> children;
     Node parent;
 
@@ -59,7 +59,9 @@ public class MonteCarlo implements Agent{
     Node x = new Node(nodeCounter, action, ratio, children, parent);
     nodeCounter++;
     if (x.parent != null){
-      x.parent.children.add(x);
+      	if(!x.parent.children.contains(x)){
+      		x.parent.children.add(x);
+      	}
     }
     return x;
   }
@@ -85,7 +87,7 @@ public class MonteCarlo implements Agent{
     }
     nodeCounter = 0;
     ArrayList<Node> rootList = new ArrayList<Node>();
-    root = newNode(nodeCounter, null, new int[]{-1, 1, 1}, rootList, null);
+    root = newNode(nodeCounter, null, new int[]{0, 0, 0, -1}, rootList, null);
   }
 
   /**
@@ -102,78 +104,102 @@ public class MonteCarlo implements Agent{
     Action act = null;
     try{
       switch(card.value()){
-
-      	//ADD CASES
       	case 1:
       	  for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRIEST);  
-            if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            if(current.legalAction(act, card)){
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.BARON);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	} 	 
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.HANDMAID);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRINCE);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.KING);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.COUNTESS);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRINCESS);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 2:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playPriest(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }  
         case 3:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playBaron(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             } 
           }
         case 4: 
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playHandmaid(myIndex);  
             if (current.legalAction(act, card)){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             } 
           }
         case 5:
           for(int i = 0; i < 4; i++){
             act = Action.playPrince(myIndex, i);  
             if (current.legalAction(act, card) && state.getCard(myIndex).value() != 7){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 6:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playKing(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, card) && state.getCard(myIndex).value() != 7){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 7:
           act = Action.playCountess(myIndex);  
           if (current.legalAction(act, card)){
-            possibleActions.add(act);
+              if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+              }
           }
         default:
           act = null;
@@ -186,72 +212,98 @@ public class MonteCarlo implements Agent{
       	  for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRIEST);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+            	if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.BARON);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.HANDMAID);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRINCE);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.KING);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.COUNTESS);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRINCESS);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 2:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playPriest(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }  
         case 3:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playBaron(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             } 
           }
         case 4: 
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playHandmaid(myIndex);  
             if (current.legalAction(act, state.getCard(myIndex))){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             } 
           }  
         case 5:
           for(int i = 0; i < 4; i++){
             act = Action.playPrince(myIndex, i);
             if (current.legalAction(act, state.getCard(myIndex)) && card.value() != 7){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 6:
           for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playKing(myIndex, opponentsIndex[i]);  
             if (current.legalAction(act, state.getCard(myIndex)) && card.value() != 7){
-              possibleActions.add(act);
+                if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
             }
           }
         case 7:
           act = Action.playCountess(myIndex);  
           if (current.legalAction(act, state.getCard(myIndex))){
-            possibleActions.add(act);
+              if(!possibleActions.contains(act)){
+            		possibleActions.add(act);
+            	}
           }
         default:
           act = null;
@@ -261,51 +313,64 @@ public class MonteCarlo implements Agent{
     return possibleActions;
   }  
 
-  public int[] simulateGameplay(int cardDrawn, int cardSelected, int[] ratio){
+  public int[] simulateGameplay(int cardDrawn, int cardSelected, int[] ratio, int turn){
     int playerKilled = -1;
-    ratio[0] = playerKilled;
+    ratio[3] = playerKilled;
     Random r = new Random();
     float chance = r.nextFloat();
-
     if(cardDrawn == cardSelected) {
       ratio[2]++;
     }
     if(cardDrawn == 0){
       ratio[1]++;
-      if(chance <= 0.15f){ // 15% success rate 
-        playerKilled = r.nextInt(3); // random player
+      ratio[2]++;
+      if(chance <= 0.15f){ 
+        playerKilled = r.nextInt(4); // random player
+        while (playerKilled == turn){
+        	playerKilled = r.nextInt(4);
+        }
       }
     }
     else if(cardDrawn == 1){
       ratio[1]++;
+      ratio[2]++;
     }
     else if(cardDrawn == 2){
       ratio[1]++;
-      if(chance <= 0.30f){ // 25% success rate 
-        playerKilled = r.nextInt(3); // random player
+      ratio[2]++;
+      if(chance <= 0.25f){ // 25% success rate 
+        playerKilled = r.nextInt(4); // random player
+        while (playerKilled == turn){
+        	playerKilled = r.nextInt(4);
+        }
       }  
     }
     else if(cardDrawn == 3){
       ratio[1]++;
+      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 4){
       ratio[1]++;
+      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 5){
       ratio[1]++;
+      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 6){
       ratio[1]++;
+      ratio[2]++;
       //nothing
     }
     else if(cardDrawn == 7){
       ratio[1]++;
+      ratio[2]++;
       //nothing
     }
-    ratio[0] = playerKilled;
+    ratio[3] = playerKilled;
     return ratio;
   }
 
@@ -344,7 +409,7 @@ public class MonteCarlo implements Agent{
    * @throws IllegalActionException when the Action produced is not legal.
    * */
   public Action playCard(Card c){
-    Action act = null;
+  	Action act = null;
     Card play;
     ArrayList<Action> possibleActions = new ArrayList<Action>();
     possibleActions = possibleActionsList(c, current);
@@ -391,7 +456,7 @@ public class MonteCarlo implements Agent{
     Node[] nodeList = new Node[possibleActions.size()];
 
     for(int a = 0; a < nodeList.length; a++){
-    	nodeList[a] = newNode(nodeCounter, possibleActions.get(a), new int[]{-1, 1, 1}, new ArrayList<Node>(), root);
+    	nodeList[a] = newNode(nodeCounter, possibleActions.get(a), new int[]{0, 0, 0, -1}, new ArrayList<Node>(), root);
     }
 
 	actionNode struct = new actionNode(possibleActions, nodeList);
@@ -399,67 +464,98 @@ public class MonteCarlo implements Agent{
 
     Action best = null;
     double compare = 0.0;
-    //for loop sort array
-    for(int x = 0; x < possibleActions.size(); x++){
+  
+
+    // for(int x = 0; x < root.children.size(); x++){
+    // 	if(root.children.get(x).ratio[1] == 0){
+    // 		root.children.get(x).ratio[1] = 1;
+    // 	}
+    // 	if(root.children.get(x).ratio[2] == 0){
+    // 		root.children.get(x).ratio[2] = 1;
+    // 	}
+    // 	if((root.children.get(x).ratio[0] / root.children.get(x).ratio[1] / root.children.get(x).ratio[2]) > compare){
+    // 		compare = (root.children.get(x).ratio[0] / root.children.get(x).ratio[1] / root.children.get(x).ratio[2]);
+    // 		if(struct.actionList.contains(root.children.get(x).action)){
+    // 			best = root.children.get(x).action;
+    // 		}
+    //   	}      	
+    // }    
+
+    for(int x = 0; x < struct.actionList.size(); x++){
+    	if(struct.nodeList[x].ratio[1] == 0){
+    		struct.nodeList[x].ratio[1] = 1;
+    	}
+    	if(struct.nodeList[x].ratio[2] == 0){
+    		struct.nodeList[x].ratio[2] = 1;
+    	}
     	if((struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2]) > compare){
-    		compare = struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2];
+    		compare = (struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2]);	
     		best = struct.nodeList[x].action;
-      	}  
-    }
+      	}      	
+    }    
+
 
     if (best == null){
     	return possibleActions.get(0);
     }
+
     return best;
   }
     
   public actionNode monteLoop(actionNode action, int[] cardStorage, int currentCard, int depth, int max){ 
-  	if(max == 1 && depth > 0){ // NOPE
-  		return action;
-  	}
-  	int maxwin = 0;
-  	if(action.actionList.size() == 1){
-  		return action;
-  	}
+  	
+  	// if(action.actionList.size() == 1){
+  	// 	return action;
+  	// }
+  	int maxwin = 1;
   	
   	 	for(int i = 0; i < action.actionList.size(); i++){
   	  		int playerRemaining = current.numPlayers();
   	  		int cardRemaining = 0;
   	  		int[] simulation;
   	  		if (depth == 0){
-  	  			simulation = new int[]{-1, 1, 1};
+  	  			simulation = new int[]{0, 0, 0, -1};
   	  		}
   	  		else{
   	  			simulation = action.nodeList[i].ratio;
   	  		}
   	  		int turn = current.nextPlayer();
   	  		int[] cardClone = cardStorage;
-  	  		ArrayList<Node> arrayList = new ArrayList<Node>();
-  	  		while(true){
-  	  			turn = turn % 4; 
+  	  		ArrayList<Node> arrayList = new ArrayList<Node>();  	  		
+  	  		ArrayList<Integer> remaining = new ArrayList<Integer>();
+  	  		int exist = 0;
+  	  		for (int x = 0; x < cardClone.length; x++){
+  	  			if(cardClone[x] != 0){
+  		  	  		remaining.add(x);
+  	  	    		exist++;
+  		    		cardRemaining = cardRemaining + cardClone[x];
+  	  		  	}
+  	  		}
 
-  	  			ArrayList<Integer> remaining = new ArrayList<Integer>();
-  	  			int exist = 0;
-  	  			for (int x = 0; x < cardClone.length; x++){
-  	  		  		if(cardClone[x] != 0){
-  		  		  		remaining.add(x);
-  	  		    			exist++;
-  	  		    			cardRemaining = cardRemaining + cardClone[x];
-  	  		  		}
-  	  			}
-  	  			
-  	  			if(exist == 0 || playerRemaining == 1) {
-  	  				if(depth == 0){
-  	  					simulation[0] = 1;
-  	  					maxwin = 1;
+  	  		while(true){
+  	  			turn = turn % 4; 	
+
+  	  			if(playerRemaining == 1){
+  	  				simulation[0]++;
+  	  				if(simulation[0] > maxwin){
+  	  					maxwin = simulation[0];
   	  				}
-  	  				else{
-  	  					simulation[0] = simulation[0]++;
+  	  				break;
+  	  			}
+
+  	  			if(cardRemaining == 0){
+  	  				Random rng = new Random();
+  	  				float success = rng.nextFloat();
+  	  				if(success <= 0.25f){  	  					
+  	  					simulation[0]++;
   	  					if(simulation[0] > maxwin){
   	  						maxwin = simulation[0];
   	  					}
   	  				}
-  	  		  		break;
+  	  				else{
+  	  					break;
+  	  				}
+  	  				break;
   	  			}
   	  				
   	  			int draw = Math.abs(rand.nextInt() % exist);
@@ -468,42 +564,43 @@ public class MonteCarlo implements Agent{
   	  			cardRemaining--;
 
   	  			//SIMULATION FUNCTION
-  	  			simulation = simulateGameplay(result, currentCard, simulation);
-  	  			if(simulation[0] != -1){
+  	  			simulation = simulateGameplay(result, currentCard, simulation, turn);
+  	  			if(simulation[3] != -1){
   	  		  		playerRemaining--;
   	  			}
-  	  			if (simulation[0] == myIndex){
-   		  			if(depth == 0){
-   		  				simulation[0] = 0;
-   		  			}
+  	  			if (simulation[3] == myIndex){
    		  			break;
-  	  				}
+  	  			}
   	  			turn++;
   	  		}
-
-  	  		if(depth == 0){
-  	  			action.nodeList[i].ratio = simulation;
-  	  		}
-  	  		else{
-  	  			action.nodeList[i] = newNode(nodeCounter, action.actionList.get(i), simulation, arrayList, action.nodeList[i]);
+  	  		action.nodeList[i].ratio = simulation;
+  	  		Node temp = action.nodeList[i];
+  	  		while(temp.parent != null){
+  	  			temp.parent.ratio[0] += simulation[0];
+  	  			temp.parent.ratio[1] += simulation[1];
+  	  			temp.parent.ratio[2] += simulation[2];
+  	  			temp = temp.parent;
   	  		}
   	  	}
-  	  	
-  	  	if (maxwin == 0){
-  	  		return action;
-  	  	}
+  	  
 
   	  	ArrayList<Action> improved = new ArrayList<Action>();
   	  	ArrayList<Node> solulist = new ArrayList<Node>();
+  	  	
   	  	for(int x = 0; x < action.actionList.size(); x++){
   	  		if (action.nodeList[x].ratio[0] == maxwin){
   	  			improved.add(action.actionList.get(x));
-  	  			solulist.add(action.nodeList[x]);
+  	  			solulist.add(newNode(nodeCounter, action.actionList.get(x), new int[]{0, 0, 0, -1}, new ArrayList<Node>(), action.nodeList[x]));
   	  		}
   	  	}
+
+  	  	if(improved.size() == 0){
+  	  		return action;
+  	  	}
+
   	  	Node[] solList = solulist.toArray(new Node[solulist.size()]);
   	  	actionNode solution = new actionNode(improved, solList);
-  	  	solution = monteLoop(solution, cardStorage, currentCard, 1, maxwin);
+  	  	solution = monteLoop(solution, cardStorage, currentCard, depth++, maxwin);
   	
   	return action;
   }
