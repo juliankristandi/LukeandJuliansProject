@@ -3,7 +3,6 @@ import java.util.Random;
 import java.io.PrintStream;
 import agents.RandomAgent;
 import agents.MonteCarlo;
-import agents.AgentSmith;
 
 /**
  * A class for running a single game of LoveLetter.
@@ -14,7 +13,6 @@ public class LoveLetter{
 
   private Agent rando;
   private Agent monte;
-  private Agent smith;
   private Random random;
   private PrintStream ps;
   static int[] winners = new int[4];
@@ -33,7 +31,6 @@ public class LoveLetter{
     this.ps = ps;
     rando = new RandomAgent();
     monte = new MonteCarlo();
-    smith = new AgentSmith();
   }
 
   /**

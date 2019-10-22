@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
+ * Ignatius Julian Kristandi 22167432
  * */
 public class MonteCarlo implements Agent{
 
@@ -24,14 +25,17 @@ public class MonteCarlo implements Agent{
   }
 
   /**
-   * Reports the agents name
-   * */
-  public String toString(){return "MonteCarlo but not really";}
+   * Reports the agents name.
+   **/
+  public String toString(){return "Imperfect MonteCarlo";}
 
+  /**
+   * Custom Node class for Monte Carlo Tree Search.
+   **/
   class Node{
     int id;
     Action action;
-    int[] ratio; // [win, played, available, playerKilled] 
+    int[] ratio; // 4 elements which contains = [win, played, available, playerKilled] 
     ArrayList<Node> children;
     Node parent;
 
@@ -44,22 +48,20 @@ public class MonteCarlo implements Agent{
     }
 
   }
-
-  class actionNode{
-  	ArrayList<Action> actionList;
-  	Node[] nodeList;
-
-  	actionNode(ArrayList<Action> actionList, Node[] nodeList){
-  		this.actionList = actionList;
-  		this.nodeList = nodeList;
-  	}
-  }
-
+  /**
+   * Method called to create new nodes, ensures parents are linked with children, and provides a unique counter for the id.
+   * @param id the node count
+   * @param action action linked to the node 
+   * @param ratio ratio array that consists of win, played, available; used to calculate the best option
+   * @param children an arraylist that contains the children of this node
+   * @param parent the parent node for this specific node
+   * @return the new node created
+   **/  
   public Node newNode(int id, Action action, int[] ratio, ArrayList<Node> children, Node parent){
     Node x = new Node(nodeCounter, action, ratio, children, parent);
     nodeCounter++;
     if (x.parent != null){
-      	if(!x.parent.children.contains(x)){
+      	if(!x.parent.children.contains(x)){ // ensures no duplicates
       		x.parent.children.add(x);
       	}
     }
@@ -73,6 +75,8 @@ public class MonteCarlo implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
+
+    // if functions to have an array of index for our opponents
     if(myIndex == 0){
       opponentsIndex = new int[]{1, 2, 3};  
     }
@@ -99,11 +103,18 @@ public class MonteCarlo implements Agent{
     current = results;
   }
 
+  /**
+   * Method to build an arraylist of all the possible actions based on cards in hand
+   * @param card the card drawn from the deck
+   * @param state the current state to obtain the card already in hand
+   * @return an array list of all the possible actions
+   * @throws IllegalActionException when action is illegal
+   * **/
   public ArrayList<Action> possibleActionsList (Card card, State state){
     ArrayList<Action> possibleActions = new ArrayList<Action>();
     Action act = null;
     try{
-      switch(card.value()){
+      switch(card.value()){ // card drawn from deck
       	case 1:
       	  for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRIEST);  
@@ -207,7 +218,7 @@ public class MonteCarlo implements Agent{
     }
     catch(IllegalActionException e){}
     try{
-      switch(state.getCard(myIndex).value()){
+      switch(state.getCard(myIndex).value()){ // card already in hand
       	case 1:
       	  for(int i = 0; i < opponentsIndex.length; i++){
             act = Action.playGuard(myIndex, opponentsIndex[i], Card.PRIEST);  
@@ -313,6 +324,16 @@ public class MonteCarlo implements Agent{
     return possibleActions;
   }  
 
+  /**
+   * Method to simulate gameplay (Simulation aspect of Monte Carlo)
+   * Currently the simulation method is very basic, where we calculate a random chance
+   * for a player to get eliminated.
+   * @param cardDrawn the card drawn
+   * @param cardSelected the card of the node being simulated
+   * @param ratio main monte carlo ratio
+   * @param turn index of player of the current turn
+   * @return the monte carlo ratio
+   * **/
   public int[] simulateGameplay(int cardDrawn, int cardSelected, int[] ratio, int turn){
     int playerKilled = -1;
     ratio[3] = playerKilled;
@@ -324,7 +345,7 @@ public class MonteCarlo implements Agent{
     if(cardDrawn == 0){
       ratio[1]++;
       ratio[2]++;
-      if(chance <= 0.15f){ 
+      if(chance <= 0.15f){ // 15% success rate
         playerKilled = r.nextInt(4); // random player
         while (playerKilled == turn){
         	playerKilled = r.nextInt(4);
@@ -348,58 +369,25 @@ public class MonteCarlo implements Agent{
     else if(cardDrawn == 3){
       ratio[1]++;
       ratio[2]++;
-      //nothing
     }
     else if(cardDrawn == 4){
       ratio[1]++;
       ratio[2]++;
-      //nothing
     }
     else if(cardDrawn == 5){
       ratio[1]++;
       ratio[2]++;
-      //nothing
     }
     else if(cardDrawn == 6){
       ratio[1]++;
       ratio[2]++;
-      //nothing
     }
     else if(cardDrawn == 7){
       ratio[1]++;
       ratio[2]++;
-      //nothing
     }
     ratio[3] = playerKilled;
     return ratio;
-  }
-
-  public Card cardIndex(int index){
-    if(index == 0){
-      return Card.GUARD;
-    }
-    else if(index == 1){
-      return Card.PRIEST;
-    }
-    else if(index == 2){
-      return Card.BARON;
-    }    
-    else if(index == 3){
-      return Card.HANDMAID;
-    }    
-    else if(index == 4){
-      return Card.PRINCE;
-    }    
-    else if(index == 5){
-      return Card.KING;
-    }
-    else if(index == 6){
-      return Card.COUNTESS;
-    } 
-    else if(index == 7){
-      return Card.PRINCESS;
-    }
-    return null;
   }
 
   /**
@@ -412,26 +400,21 @@ public class MonteCarlo implements Agent{
   	Action act = null;
     Card play;
     ArrayList<Action> possibleActions = new ArrayList<Action>();
-    possibleActions = possibleActionsList(c, current);
-      
-    int[] cardStorage = new int[] {5,2,2,2,2,1,1,1};
-
+    possibleActions = possibleActionsList(c, current); // all the possible moves.
+    int[] cardStorage = new int[] {5,2,2,2,2,1,1,1}; //no. of guards, priests, etc.
     int playerRemaining = current.numPlayers();
-
-    for(int i = 0; i < current.numPlayers();i++){
-
+    for(int i = 0; i < current.numPlayers();i++){ // for loop to update cardStorage to have an idea of what cards are left.
     	java.util.Iterator<Card> discardPile = current.getDiscards(i);
-        
         while(discardPile.hasNext()){
           int val = discardPile.next().value();
           switch(val){
             case 1:
               cardStorage[0]--;
               break;
-            case 2: // priest
+            case 2: 
               cardStorage[1]--;
               break;
-              case 3: // baron
+              case 3: 
               cardStorage[2]--;
               break;
               case 4:
@@ -452,64 +435,44 @@ public class MonteCarlo implements Agent{
           }
         }
     }
-
     Node[] nodeList = new Node[possibleActions.size()];
-
-    for(int a = 0; a < nodeList.length; a++){
+    for(int a = 0; a < nodeList.length; a++){ // populates nodelist with all the possible moves
     	nodeList[a] = newNode(nodeCounter, possibleActions.get(a), new int[]{0, 0, 0, -1}, new ArrayList<Node>(), root);
     }
-
-	actionNode struct = new actionNode(possibleActions, nodeList);
-	struct = monteLoop(struct, cardStorage, c.value(), 0, 0); 
-
+	nodeList = monteLoop(nodeList, cardStorage, c.value(), 0, 0); 
     Action best = null;
     double compare = 0.0;
-  
-
-    // for(int x = 0; x < root.children.size(); x++){
-    // 	if(root.children.get(x).ratio[1] == 0){
-    // 		root.children.get(x).ratio[1] = 1;
-    // 	}
-    // 	if(root.children.get(x).ratio[2] == 0){
-    // 		root.children.get(x).ratio[2] = 1;
-    // 	}
-    // 	if((root.children.get(x).ratio[0] / root.children.get(x).ratio[1] / root.children.get(x).ratio[2]) > compare){
-    // 		compare = (root.children.get(x).ratio[0] / root.children.get(x).ratio[1] / root.children.get(x).ratio[2]);
-    // 		if(struct.actionList.contains(root.children.get(x).action)){
-    // 			best = root.children.get(x).action;
-    // 		}
-    //   	}      	
-    // }    
-
-    for(int x = 0; x < struct.actionList.size(); x++){
-    	if(struct.nodeList[x].ratio[1] == 0){
-    		struct.nodeList[x].ratio[1] = 1;
+    for(int x = 0; x < nodeList.length; x++){
+    	if(nodeList[x].parent.ratio[1] == 0){ //increases winrate & can't divide by zero
+    		nodeList[x].parent.ratio[1] = 1;
     	}
-    	if(struct.nodeList[x].ratio[2] == 0){
-    		struct.nodeList[x].ratio[2] = 1;
+    	if(nodeList[x].parent.ratio[2] == 0){ //increases winrate & can't divide by zero
+    		nodeList[x].parent.ratio[2] = 1;
     	}
-    	if((struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2]) > compare){
-    		compare = (struct.nodeList[x].ratio[0] / struct.nodeList[x].ratio[1] / struct.nodeList[x].ratio[2]);	
-    		best = struct.nodeList[x].action;
+    	if((nodeList[x].parent.ratio[0] / nodeList[x].parent.ratio[1] / nodeList[x].parent.ratio[2]) > compare){ // main ratio
+    		compare = (nodeList[x].parent.ratio[0] / nodeList[x].parent.ratio[1] / nodeList[x].parent.ratio[2]);	
+    		best = nodeList[x].parent.action;
       	}      	
     }    
-
-
     if (best == null){
-    	return possibleActions.get(0);
+    	return possibleActions.get(possibleActions.size() - 1); //if can't determine best action, use the last possible action
     }
-
     return best;
   }
-    
-  public actionNode monteLoop(actionNode action, int[] cardStorage, int currentCard, int depth, int max){ 
-  	
-  	// if(action.actionList.size() == 1){
-  	// 	return action;
-  	// }
+  
+  /**
+   * Monte Carlo function, where the selection, expansion and back propagation phase is done.
+   * The simulation phase is done in the simulateGameplay() function.
+   * @param nodeList the node list to work with
+   * @param cardStorage the deck of cards that is left in play
+   * @param currentCard the current card being drawn from deck
+   * @param depth to specify depth for the search
+   * @param max the highest number of win
+   * @return an array of nodes with ratios already calculated
+   * */  
+  public Node[] monteLoop(Node[] nodeList, int[] cardStorage, int currentCard, int depth, int max){ 
   	int maxwin = 1;
-  	
-  	 	for(int i = 0; i < action.actionList.size(); i++){
+  	 	for(int i = 0; i < nodeList.length; i++){ //inspects each node in the list
   	  		int playerRemaining = current.numPlayers();
   	  		int cardRemaining = 0;
   	  		int[] simulation;
@@ -517,7 +480,7 @@ public class MonteCarlo implements Agent{
   	  			simulation = new int[]{0, 0, 0, -1};
   	  		}
   	  		else{
-  	  			simulation = action.nodeList[i].ratio;
+  	  			simulation = nodeList[i].ratio;
   	  		}
   	  		int turn = current.nextPlayer();
   	  		int[] cardClone = cardStorage;
@@ -531,19 +494,16 @@ public class MonteCarlo implements Agent{
   		    		cardRemaining = cardRemaining + cardClone[x];
   	  		  	}
   	  		}
-
   	  		while(true){
   	  			turn = turn % 4; 	
-
-  	  			if(playerRemaining == 1){
+  	  			if(playerRemaining == 1){ // win situation
   	  				simulation[0]++;
   	  				if(simulation[0] > maxwin){
   	  					maxwin = simulation[0];
   	  				}
   	  				break;
   	  			}
-
-  	  			if(cardRemaining == 0){
+  	  			if(cardRemaining == 0){ // no cards left, 25% win chance
   	  				Random rng = new Random();
   	  				float success = rng.nextFloat();
   	  				if(success <= 0.25f){  	  					
@@ -557,14 +517,11 @@ public class MonteCarlo implements Agent{
   	  				}
   	  				break;
   	  			}
-  	  				
-  	  			int draw = Math.abs(rand.nextInt() % exist);
+  	  			int draw = Math.abs(rand.nextInt() % exist); //draws a random existing card
   	  			int result = remaining.get(draw);
   	  			cardClone[result]--;
   	  			cardRemaining--;
-
-  	  			//SIMULATION FUNCTION
-  	  			simulation = simulateGameplay(result, currentCard, simulation, turn);
+  	  			simulation = simulateGameplay(result, currentCard, simulation, turn); // simulation phase
   	  			if(simulation[3] != -1){
   	  		  		playerRemaining--;
   	  			}
@@ -573,36 +530,30 @@ public class MonteCarlo implements Agent{
   	  			}
   	  			turn++;
   	  		}
-  	  		action.nodeList[i].ratio = simulation;
-  	  		Node temp = action.nodeList[i];
-  	  		while(temp.parent != null){
+  	  		nodeList[i].ratio = simulation;
+  	  		Node temp = nodeList[i];
+  	  		while(temp.parent != null){ // back propagation phase
   	  			temp.parent.ratio[0] += simulation[0];
   	  			temp.parent.ratio[1] += simulation[1];
   	  			temp.parent.ratio[2] += simulation[2];
   	  			temp = temp.parent;
   	  		}
   	  	}
-  	  
-
-  	  	ArrayList<Action> improved = new ArrayList<Action>();
   	  	ArrayList<Node> solulist = new ArrayList<Node>();
-  	  	
-  	  	for(int x = 0; x < action.actionList.size(); x++){
-  	  		if (action.nodeList[x].ratio[0] == maxwin){
-  	  			improved.add(action.actionList.get(x));
-  	  			solulist.add(newNode(nodeCounter, action.actionList.get(x), new int[]{0, 0, 0, -1}, new ArrayList<Node>(), action.nodeList[x]));
+  	  	for(int x = 0; x < nodeList.length; x++){
+  	  		if (nodeList[x].ratio[0] == maxwin){ // selection phase
+  	  			solulist.add(newNode(nodeCounter, nodeList[x].action, new int[]{0, 0, 0, -1}, new ArrayList<Node>(), nodeList[x]));
   	  		}
   	  	}
-
-  	  	if(improved.size() == 0){
-  	  		return action;
+  	  	if(solulist.size() == 0){ // nothing to be expanded
+  	  		return nodeList; 
   	  	}
-
   	  	Node[] solList = solulist.toArray(new Node[solulist.size()]);
-  	  	actionNode solution = new actionNode(improved, solList);
-  	  	solution = monteLoop(solution, cardStorage, currentCard, depth++, maxwin);
-  	
-  	return action;
+  	  	if(solulist.size() == 1){ // only one node selected
+  	  		return solList; 
+  	  	}  	  	
+  	  	solList = monteLoop(solList, cardStorage, currentCard, depth++, maxwin); // expansion phase
+  		return solList;
   }
 
 }
